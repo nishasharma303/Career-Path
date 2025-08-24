@@ -11,35 +11,35 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, Layers, Search, Settings, UserCircle, Wallet, Wrench } from "lucide-react"
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const items = [
     {
-        title: "Home",
-        url: "#",
-        icon: Home,
+        title: "Workspace",
+        url: "/dashboard",
+        icon: Layers,
     },
     {
-        title: "Inbox",
-        url: "#",
-        icon: Inbox,
+        title: "AI Tools",
+        url: "/ai-tools",
+        icon: Wrench,
     },
     {
-        title: "Calendar",
-        url: "#",
+        title: "My History",
+        url: "/my-history",
         icon: Calendar,
     },
     {
-        title: "Search",
-        url: "#",
-        icon: Search,
+        title: "Billing",
+        url: "billing",
+        icon: Wallet,
     },
     {
-        title: "Settings",
-        url: "#",
-        icon: Settings,
+        title: "Profile",
+        url: "profile",
+        icon: UserCircle,
     },
 ]
 
@@ -48,10 +48,10 @@ export function AppSidebar() {
     return (
         <Sidebar>
             <SidebarHeader>
-                <div className='p-4'>
-                    <Image src={'./logo.svg'} alt='logo' width={100} height={100}
-                        className='w-full h-full' />
-                    <h2 className='text-sm text-gray-400 text-center'>Build Awesome</h2>
+                <div >
+                    <Image src={'/logo.png'} alt='logo' width={200} height={200}
+                        className='w-full  ' />
+                    <h2 className='text-md text-gray-400 text-center mt-3'>Build Awesome Skills</h2>
                 </div>
             </SidebarHeader>
             <SidebarContent>
@@ -75,7 +75,7 @@ export function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <h2 className='p-2 text-gray-400 text-sm'>Copyright @Tubeguruji</h2>
+                <h2 className='p-2 text-gray-400 text-sm'></h2>
             </SidebarFooter>
         </Sidebar>
     )
