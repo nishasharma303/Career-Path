@@ -1,6 +1,7 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  serverExternalPackages: ['@inngest/next'],
+  // Remove the experimental and api sections completely
+}
 
-const nextConfig: NextConfig = {
-};
-
-export default nextConfig;
+module.exports = nextConfig

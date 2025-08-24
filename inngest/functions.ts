@@ -5,8 +5,6 @@ import { parse } from "path";
 import { HistoryTable } from "@/configs/schema";
 import { db } from "@/configs/db";
 
-
-
 export const helloWorld = inngest.createFunction(
   { id: "hello-world" },
   { event: "test/hello.world" },
@@ -33,7 +31,7 @@ export const AiResumeAnalyzerAgent = createAgent({
     system:`You are an advanced AI Resume Analyzer Agent.
 
 Task:
-Evaluate a candidate’s resume and return a detailed analysis in the following structured JSON schema format. The schema must match the layout and structure of a visual UI that includes:
+Evaluate a candidate's resume and return a detailed analysis in the following structured JSON schema format. The schema must match the layout and structure of a visual UI that includes:
 
 Overall score
 
@@ -75,7 +73,7 @@ Optional comment about that section
 
 Tips for Improvement: 3–5 tips.
 
-What’s Good: 1–3 strengths.
+What's Good: 1–3 strengths.
 
 Needs Improvement: 1–3 weaknesses.
 
@@ -208,18 +206,38 @@ export const AiResumeAgent = inngest.createFunction(
     // Run AI Resume Analyzer
     const aiResumeReport = await AiResumeAnalyzerAgent.run(pdfText);
 
-    // Extract clean JSON from AI response
-    // @ts-ignore
-    const rawContent = aiResumeReport.output[0].content;
-    const rawContentJson = rawContent.replace('```json', '').replace('```', '');
-    const parseJson = JSON.parse(rawContentJson);
+    // ✅ ADDED ERROR HANDLING FOR JSON PARSING
+    let parseJson;
+    try {
+      // @ts-ignore
+      const rawContent = aiResumeReport.output[0].content;
+      const rawContentJson = rawContent.replace('```json', '').replace('```', '').trim();
+      parseJson = JSON.parse(rawContentJson);
+    } catch (error) {
+      console.error("JSON Parse Error in Resume Agent:", error);
+      // Fallback JSON structure
+      parseJson = {
+        overall_score: 0,
+        overall_feedback: "Error analyzing resume",
+        summary_comment: "Sorry, there was an error processing your resume. Please try again.",
+        sections: {
+          contact_info: { score: 0, comment: "Error" },
+          experience: { score: 0, comment: "Error" },
+          education: { score: 0, comment: "Error" },
+          skills: { score: 0, comment: "Error" }
+        },
+        tips_for_improvement: ["Please try uploading your resume again"],
+        whats_good: [],
+        needs_improvement: []
+      };
+    }
 
     // Save to database
     const saveToDb = await step.run("SaveToDb", async () => {
       // @ts-ignore
       const result = await db.insert(HistoryTable).values({
         recordId: recordId,
-        content: parseJson,     // make sure this column is JSON in your schema
+        content: parseJson,
         aiAgentType: aiAgentType,
         createdAt: new Date().toISOString(),
         userEmail: userEmail,
@@ -229,7 +247,6 @@ export const AiResumeAgent = inngest.createFunction(
       return parseJson;
     });
 
-    // ✅ Return the final saved result
     return saveToDb;
   }
 );
@@ -242,30 +259,40 @@ export const AIRoadmapAgent = inngest.createFunction(
 
         const roadmapResult = await AIRoadmapGeneratorAgent.run("UserInput:"+userInput);
 
-        // Extract clean JSON from AI response
-    // @ts-ignore
-    const rawContent = roadmapResult.output[0].content;
-    const rawContentJson = rawContent.replace('```json', '').replace('```', '');
-    const parseJson = JSON.parse(rawContentJson);
+        // ✅ ADDED ERROR HANDLING FOR JSON PARSING
+        let parseJson;
+        try {
+          // @ts-ignore
+          const rawContent = roadmapResult.output[0].content;
+          const rawContentJson = rawContent.replace('```json', '').replace('```', '').trim();
+          parseJson = JSON.parse(rawContentJson);
+        } catch (error) {
+          console.error("JSON Parse Error in Roadmap Agent:", error);
+          // Fallback JSON structure
+          parseJson = {
+            roadmapTitle: "Error Generating Roadmap",
+            description: "Sorry, there was an error generating your roadmap. Please try again.",
+            duration: "Unknown",
+            initialNodes: [],
+            initialEdges: []
+          };
+        }
 
-    // Save to database
-    const saveToDb = await step.run("SaveToDb", async () => {
-      // @ts-ignore
-      const result = await db.insert(HistoryTable).values({
-        recordId: roadmapId,
-        content: parseJson,     // make sure this column is JSON in your schema
-        aiAgentType: '/ai-tools/ai-roadmap-agent',
-        createdAt: new Date().toISOString(),
-        userEmail: userEmail,
-        metaData: userInput
-      });
-      console.log(result);
-      return parseJson;
-    });
+        // Save to database
+        const saveToDb = await step.run("SaveToDb", async () => {
+          // @ts-ignore
+          const result = await db.insert(HistoryTable).values({
+            recordId: roadmapId,
+            content: parseJson,
+            aiAgentType: '/ai-tools/ai-roadmap-agent',
+            createdAt: new Date().toISOString(),
+            userEmail: userEmail,
+            metaData: userInput
+          });
+          console.log(result);
+          return parseJson;
+        });
 
-    // ✅ Return the final saved result
-    return saveToDb;
-
-        
+        return saveToDb;
     }
-)
+);
