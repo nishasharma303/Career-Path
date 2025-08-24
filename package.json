@@ -32,7 +32,7 @@
     "pdf-parse": "^1.1.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-markdown": "^8.0.7",
+    "react-markdown": "^10.1.0",
     "reactflow": "^11.11.4",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
@@ -40,9 +40,9 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/node": "^20.19.11",
+    "@types/react": "^19.1.11",
+    "@types/react-dom": "^19.1.7",
     "drizzle-kit": "^0.30.4",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",

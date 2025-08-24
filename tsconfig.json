@@ -14,12 +14,13 @@
     "jsx": "preserve",
     "incremental": true,
     "noImplicitAny": false,
+    "types": ["react", "react-dom", "node"], 
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "baseUrl": ".", 
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     }
