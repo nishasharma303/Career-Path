@@ -19,16 +19,18 @@ const AiChat = () => {
   const [userInput, setUserInput] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [messageList, setMessageList] = useState<Message[]>([])
-  const { chatid }: any = useParams();
+  const { chatid }:any = useParams();
   const router = useRouter();
+  console.log(chatid);
 
   useEffect(() => {
     chatid && GetMessageList();
   }, [chatid])
 
-  const GetMessageList = async () => {
-    const result = await axios.get('/api/history?recordId=' + chatid);
-    setMessageList(result?.data?.content || []);
+  const GetMessageList= async() => {
+    const result = await axios.get('/api/history?recordId='+chatid);
+    console.log(result.data);
+    setMessageList(result?.data?.content);
   }
 
   const onSend = async () => {
@@ -42,21 +44,20 @@ const AiChat = () => {
     setUserInput('')
 
     try {
-      // OLD FORMAT: Backend returns AI response directly
       const { data } = await axios.post('/api/ai-career-chat-agent', { userInput })
-      
-      // Get the AI response directly (old format)
-      const aiResponse = data?.aiResponse || data?.result || "I couldn't process that request."
+
+      // Backend returns AI response directly
+      const aiResponse = data?.aiResponse || "I couldn't process that request."
 
       setMessageList(prev => [
         ...prev.slice(0, -1), // remove loading message
         { content: aiResponse, role: 'assistant', type: 'text' }
       ])
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error:", error)
       setMessageList(prev => [
         ...prev.slice(0, -1),
-        { content: error.response?.data?.error || "Sorry, I encountered an error. Please try again.", role: 'assistant', type: 'text' }
+        { content: "Sorry, I encountered an error. Please try again.", role: 'assistant', type: 'text' }
       ])
     } finally {
       setLoading(false)
@@ -64,32 +65,28 @@ const AiChat = () => {
   }
 
   useEffect(() => {
-    // Save messages to database
-    messageList.length > 0 && updateMessageList();
+    //save mssgs into databse
+    messageList.length>0 && updateMessageList();
+
   }, [messageList])
 
-  const updateMessageList = async () => {
-    try {
-      await axios.put('/api/history', {
-        content: messageList,
-        recordId: chatid
-      });
-    } catch (error) {
-      console.error("Error updating message list:", error);
-    }
+  const updateMessageList=async() =>{
+    const result=await axios.put('/api/history', {
+      content: messageList,
+      recordId: chatid
+    });
+    console.log(result);
   }
 
-  const onNewChat = async () => {
-    const id = uuidv4();
-    try {
-      await axios.post('/api/history', {
-        recordId: id,
-        content: []
-      });
-      router.replace("/ai-tools/ai-chat/" + id);
-    } catch (error) {
-      console.error("Error creating new chat:", error);
-    }
+  const onNewChat =async ()=>{
+    const id= uuidv4();
+    //create new record to history table
+    const result = await axios.post('/api/history', {
+      recordId:id,
+      content:[]
+    });
+    console.log(result);
+    router.replace("/ai-tools/ai-chat/"+id);
   }
 
   return (
@@ -111,30 +108,27 @@ const AiChat = () => {
 
         <div className='flex-1 overflow-y-auto mb-4'>
           {messageList.map((message, index) => (
-            <div
-              key={index}
-              className={`flex mb-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`p-3 rounded-lg max-w-[80%] break-words ${
-                message.role === 'user' ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-900'
-              }`}>
-                {message.type === 'loading' ? (
-                  <div className="flex items-center gap-2">
-                    <LoaderCircle className='animate-spin h-5 w-5' />
-                    <span>Thinking...</span>
-                  </div>
-                ) : (
-                  <ReactMarkdown>
-                    {message.content}
-                  </ReactMarkdown>
-                )}
-              </div>
-            </div>
+            <div 
+  key={index} 
+  className={`flex mb-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+>
+  <div className={`p-3 rounded-lg max-w-[80%] break-words ${
+    message.role === 'user' ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-900'
+  }`}>
+    {message.type === 'loading' ? (
+      <LoaderCircle className='animate-spin h-5 w-5' >Thinking..</LoaderCircle>
+    ) : (
+      <ReactMarkdown>
+        {message.content}
+      </ReactMarkdown>
+    )}
+  </div>
+</div>
           ))}
         </div>
 
         <div className='flex items-center justify-between gap-6'>
-          <Input
+          <Input 
             placeholder='Type here'
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
