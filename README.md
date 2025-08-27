@@ -6,6 +6,7 @@ Career Path helps users explore careers, get AI-driven guidance, and visualize p
 - ✍️ **AI Chat** – Ask career-related questions and get suggestions.  
 - 📄 **Resume Analysis** – Upload your resume for insights and recommendations.  
 - 📊 **Roadmap Generator** – Generate a personalized career roadmap based on your profile.  
+- 🕘 **History** – View your previous queries, suggestions, and career insights.  
 
 ## 🛠️ Tech Stack
 - **Frontend:** React.js, Next.js, TypeScript, Tailwind CSS  
